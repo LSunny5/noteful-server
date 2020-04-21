@@ -5,6 +5,9 @@ const helmet = require('helmet');
 const cors = require('cors');
 const { NODE_ENV } = require('./config')
 
+const foldersRouter = require('./folders/folders-router');
+const notesRouter = require('./notes/notes-router');
+
 const app = express();
 
 app.use(morgan((NODE_ENV === 'production') ? 'tiny' : 'common', { skip: () => NODE_ENV === 'test' }))
@@ -14,6 +17,9 @@ app.use(cors());
 app.get('/', (req, res) => {
     res.send('Hello, world!')
 })
+
+app.use('/api/folders', foldersRouter);
+app.use('/api/notes', notesRouter);
 
 app.use(function errorHandler(error, req, res, next) {
     let response
