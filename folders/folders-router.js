@@ -1,7 +1,9 @@
 const path = require('path')
 const express = require('express')
 const xss = require('xss')
+const logger = require('../src/logger');
 const FoldersService = require('./folders-service')
+const {getFolderValidationError} = require('./validate-folder');
 
 const foldersRouter = express.Router()
 const jsonParser = express.json()
@@ -19,7 +21,7 @@ foldersRouter
             req.app.get('db')
         )
             .then(folders => {
-                res.json(folders)
+                res.json(folders.map(serializeFolder))
             })
             .catch(next)
     })
@@ -27,13 +29,32 @@ foldersRouter
         const { title } = req.body
         const newFolder = { title }
 
-        for (const [key, value] of Object.entries(newFolder))
-            if (value == null)
-                return res.status(400).json({
-                    error: { message: `Missing '${key}' in request body` }
-                })
+        for (const field of ['title']) {
+            if (!req.body[field]) {
+                logger.error({
+                    message: `Missing '${field}' in request body`,
+                    request: `${req.originalUrl}`,
+                    method: `${req.method}`,
+                    ip: `${req.ip}`
+                });
+                return res.status(400).send({
+                    error: { message: `Missing '${field}' in request body` }
+                });
+            }
+        }
 
-        newFolder.title = title
+        //validate the folder
+        const error = getFolderValidationError(newFolder);
+		if (error) {
+			logger.error({
+				message: `POST Validation Error`,
+				request: `${req.originalUrl}`,
+                method: `${req.method}`,
+                ip: `${req.ip}`
+			});
+			return res.status(400).send(error);
+		}
+
         FoldersService.insertFolder(
             req.app.get('db'),
             newFolder
@@ -47,7 +68,7 @@ foldersRouter
             .catch(next)
     })
 
-    foldersRouter
+foldersRouter
     .route('/:folder_id')
     .all((req, res, next) => {
         FoldersService.getById(
@@ -60,7 +81,7 @@ foldersRouter
                         error: { message: `Folder doesn't exist` }
                     })
                 }
-                res.folder = folder 
+                res.folder = folder
                 next()
             })
             .catch(next)
@@ -80,7 +101,7 @@ foldersRouter
     })
 
     .patch(jsonParser, (req, res, next) => {
-        const { title, content, style } = req.body
+        const { title } = req.body
         const folderToUpdate = { title }
 
         const numberOfValues = Object.values(folderToUpdate).filter(Boolean).length
@@ -91,6 +112,17 @@ foldersRouter
                 }
             })
         }
+
+        const error = getFolderValidationError(folderToUpdate);
+		if (error) {
+			logger.error({
+				message: `PATCH Validation Error`,
+				request: `${req.originalUrl}`,
+                method: `${req.method}`,
+                ip: `${req.ip}`s
+			});
+			return res.status(400).send(error);
+		}
 
         FoldersService.updateFolder(
             req.app.get('db'),

@@ -1,7 +1,9 @@
 const path = require('path')
 const express = require('express')
 const xss = require('xss')
+const logger = require('../src/logger');
 const NotesService = require('./notes-service')
+const { getNoteValidationError } = require('./validate-note');
 
 const notesRouter = express.Router()
 const jsonParser = express.json()
@@ -21,7 +23,7 @@ notesRouter
             req.app.get('db')
         )
             .then(notes => {
-                res.json(notes)
+                res.json(notes.map(serializeNote))
             })
             .catch(next)
     })
@@ -30,13 +32,25 @@ notesRouter
         const { title, content, folder_id } = req.body
         const newNote = { title, content, folder_id }
 
-        for (const [key, value] of Object.entries(newNote))
-            if (value == null)
-                return res.status(400).json({
+        for (const [key, value] of Object.entries(newNote)) {
+            if (value == null) {
+                return res.status(400).send({
                     error: { message: `Missing '${key}' in request body` }
-                })
+                });
+            }
+        }
 
-        newNote.title = title
+		const error = getNoteValidationError(newNote);
+		if (error) {
+			logger.error({
+				message: `POST Validation Error`,
+				request: `${req.originalUrl}`,
+				method: `${req.method}`,
+                ip: `${req.ip}`
+			});
+			return res.status(400).send(error);
+		}
+
         NotesService.insertNote(
             req.app.get('db'),
             newNote
@@ -83,16 +97,27 @@ notesRouter
     })
 
     .patch(jsonParser, (req, res, next) => {
-        const { title, content, style } = req.body
-        const noteToUpdate = { title }
+        const { title, content, folder_id } = req.body
+        const noteToUpdate = { title, content, folder_id }
 
         const numberOfValues = Object.values(noteToUpdate).filter(Boolean).length
         if (numberOfValues === 0) {
             return res.status(400).json({
                 error: {
-                    message: `Request body must contain a 'title''`
+                    message: `Request body must contain a 'title', 'content', or 'folder_id'`
                 }
-            })
+            });
+        }
+
+        const error = getNoteValidationError(noteToUpdate);
+        if (error) {
+            logger.error({
+                message: `PATCH Validation Error`,
+                request: `${req.originalUrl}`,
+                method: `${req.method}`,
+                ip: `${req.ip}`
+            });
+            return res.status(400).send(error);
         }
 
         NotesService.updateNote(

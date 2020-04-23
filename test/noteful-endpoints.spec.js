@@ -1,7 +1,7 @@
 const { expect } = require('chai')
 const knex = require('knex')
 const app = require('../src/app')
-const { makeNotesArray, makeFoldersArray, makeMaliciousFolder, makeMaliciousNote } = require('./noteful-fixtures')
+const { makeNotesArray, makeFoldersArray, makeMaliciousFolder, makeMaliciousNote } = require('./note-fixtures')
 
 describe('Noteful Endpoints', function () {
     let db
