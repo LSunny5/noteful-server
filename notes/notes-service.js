@@ -5,7 +5,7 @@ const NotesService = {
     getById(knex, id) {
       return knex.from('noteful_notes').select('*').where('id', id).first()
     },
-    insertBookmark(knex, newNote) {
+    insertNote(knex, newNote) {
       return knex
         .insert(newNote)
         .into('noteful_notes')
@@ -14,12 +14,12 @@ const NotesService = {
           return rows[0]
         })
     },
-    deleteBookmark(knex, id) {
+    deleteNote(knex, id) {
       return knex('noteful_notes')
         .where({ id })
         .delete()
     },
-    updateBookmark(knex, id, newNoteFields) {
+    updateNote(knex, id, newNoteFields) {
       return knex('noteful_notes')
         .where({ id })
         .update(newNoteFields)

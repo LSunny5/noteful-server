@@ -50,7 +50,7 @@ notesRouter
             .catch(next)
     })
 
-    NotesRouter
+notesRouter
     .route('/:note_id')
     .all((req, res, next) => {
         NotesService.getById(
@@ -63,7 +63,7 @@ notesRouter
                         error: { message: `Note doesn't exist` }
                     })
                 }
-                res.note = note 
+                res.note = note
                 next()
             })
             .catch(next)
@@ -106,4 +106,4 @@ notesRouter
             .catch(next)
     })
 
-module.exports = NotesRouter
+module.exports = notesRouter

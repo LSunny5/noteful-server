@@ -56,7 +56,7 @@ describe('Noteful Endpoints', function () {
             //FIX THIS TEST ****************************************************
             it(`creates a folder, responding with 201 and the new folder`, () => {
                 const newFolder = {
-                    title: 'New Folder 1',
+                    title: 'New Folder Test'
                 }
                 return supertest(app)
                     .post('/api/folders')
@@ -82,7 +82,7 @@ describe('Noteful Endpoints', function () {
                 }
 
                 it(`responds with 400 and an error message when the '${field}' is missing`, () => {
-                    delete newFolder[title]
+                    delete newFolder[field]
 
                     return supertest(app)
                         .post('/api/folders')
@@ -186,7 +186,7 @@ describe('Noteful Endpoints', function () {
                         .send({ irrelevantField: 'foo' })
                         .expect(400, {
                             error: {
-                                message: `Request body must contain either 'title', 'style' or 'content'`
+                                message: `Request body must contain a 'title'`
                             }
                         })
                 })
@@ -232,12 +232,15 @@ describe('Noteful Endpoints', function () {
                 const testNotes = makeNotesArray();
 
                 beforeEach('insert notes', () => {
+                    console.log(testNotes);
                     return db
                         .into('noteful_notes')
                         .insert(testNotes)
                 })
 
                 it('responds with 200 and all of the articles', () => {
+                    console.log('second');
+                    console.log(testNotes);
                     return supertest(app)
                         .get('/api/notes')
                         .expect(200, testNotes)
@@ -370,12 +373,12 @@ describe('Noteful Endpoints', function () {
                 it(`responds with 404`, () => {
                     const noteId = 123456
                     return supertest(app)
-                        .delete(`/api/articles/${noteId}`)
-                        .expect(404, { error: { message: `Article doesn't exist` } })
+                        .delete(`/api/notes/${noteId}`)
+                        .expect(404, { error: { message: `Note doesn't exist` } })
                 })
             })
 
-            context('Given there are articles in the database', () => {
+            context('Given there are notes in the database', () => {
                 const testNotes = makeNotesArray();
 
                 beforeEach('insert notes', () => {
