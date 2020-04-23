@@ -119,7 +119,7 @@ foldersRouter
 				message: `PATCH Validation Error`,
 				request: `${req.originalUrl}`,
                 method: `${req.method}`,
-                ip: `${req.ip}`s
+                ip: `${req.ip}`
 			});
 			return res.status(400).send(error);
 		}
