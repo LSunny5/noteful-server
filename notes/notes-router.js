@@ -34,7 +34,7 @@ notesRouter
 
         for (const [key, value] of Object.entries(newNote)) {
             if (value == null) {
-                return res.status(400).send({
+                return res.status(400).json({
                     error: { message: `Missing '${key}' in request body` }
                 });
             }
@@ -51,6 +51,7 @@ notesRouter
 			return res.status(400).send(error);
 		}
 
+        newNote.folder_id = folder_id;
         NotesService.insertNote(
             req.app.get('db'),
             newNote

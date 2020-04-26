@@ -1,4 +1,4 @@
-const logger = require('../logger');
+const logger = require('../src/logger');
 
 function getNoteValidationError({ title, content }) {
 	if (title && title.length < 3) {

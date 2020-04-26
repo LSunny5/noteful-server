@@ -37,7 +37,7 @@ foldersRouter
                     method: `${req.method}`,
                     ip: `${req.ip}`
                 });
-                return res.status(400).send({
+                return res.status(400).json({
                     error: { message: `Missing '${field}' in request body` }
                 });
             }
@@ -53,8 +53,8 @@ foldersRouter
                 ip: `${req.ip}`
 			});
 			return res.status(400).send(error);
-		}
-
+        }
+        
         FoldersService.insertFolder(
             req.app.get('db'),
             newFolder

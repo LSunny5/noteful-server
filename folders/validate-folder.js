@@ -1,8 +1,8 @@
-const logger = require('../logger');
+const logger = require('../src/logger');
 
 //check title posted is greater than 3 characters and 
-function getFolderValidationError({ name }) {
-	if (name.length < 3) {
+function getFolderValidationError({ title }) {
+	if (title.length < 3) {
 		logger.error(`Invalid title '${title}' given`);
 		return {
 			error: {
@@ -10,7 +10,7 @@ function getFolderValidationError({ name }) {
 			}
 		};
     }
-    if (name.length > 50) {
+    if (title.length > 100) {
 		logger.error(`Invalid title '${title}' given`);
 		return {
 			error: {
