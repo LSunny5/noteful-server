@@ -1,6 +1,6 @@
 require('dotenv').config();
 
-console.log ('connected to : ' + DATABASE_URL)
+console.log ('connected to : ' + process.env.DATABASE_URL)
 
 module.exports = {
   "migrationsDirectory": "migrations",
