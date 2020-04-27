@@ -17,7 +17,7 @@ describe('Folders Endpoints', function () {
     before('clean the table', () => db.raw('TRUNCATE  noteful_notes, noteful_folders RESTART IDENTITY CASCADE'))
     afterEach('cleanup', () => db.raw('TRUNCATE  noteful_notes, noteful_folders RESTART IDENTITY CASCADE'))
 
-    describe(`Unauthorized requests`, () => {
+    /* describe(`Unauthorized requests`, () => {
         const testFolders = makeFoldersArray();
 
         beforeEach('insert folder', () => {
@@ -54,7 +54,7 @@ describe('Folders Endpoints', function () {
                 .delete(`/api/folders/${oneFolder.id}`)
                 .expect(401, { error: 'Unauthorized request' });
         });
-    });
+    }); */
 
     describe(`GET /api/folders`, () => {
         context(`Given no folders`, () => {

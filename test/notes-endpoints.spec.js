@@ -18,7 +18,7 @@ describe('Notes Endpoints', function () {
     before('clean the table', () => db.raw('TRUNCATE noteful_notes, noteful_folders RESTART IDENTITY CASCADE'))
     afterEach('cleanup', () => db.raw('TRUNCATE noteful_notes, noteful_folders RESTART IDENTITY CASCADE'))
 
-    describe(`Unauthorized requests`, () => {
+    /* describe(`Unauthorized requests`, () => {
         const testFolders = makeFoldersArray();
         const testNotes = makeNotesArray();
 
@@ -63,7 +63,7 @@ describe('Notes Endpoints', function () {
                 .delete(`/api/notes/${oneNote.id}`)
                 .expect(401, { error: 'Unauthorized request' });
         });
-    });
+    }); */
 
     describe(`GET /api/notes`, () => {
         context(`Given no notes`, () => {
@@ -209,8 +209,11 @@ describe('Notes Endpoints', function () {
             const newNote = {
                 title: 'Test new note',
                 content: 'Test new note content...',
+                modified: '2020-04-22T02:58:14.367Z',
                 folder_id: 4,
             }
+
+            console.log(newNote);
             return supertest(app)
                 .post('/api/notes')
                 .send(newNote)
@@ -219,6 +222,7 @@ describe('Notes Endpoints', function () {
                 .expect(res => {
                     expect(res.body.title).to.eql(newNote.title)
                     expect(res.body.content).to.eql(newNote.content)
+                    expect(res.body.modified).to.eql(newNote.modified)
                     expect(res.body.folder_id).to.eql(newNote.folder_id)
                     expect(res.body).to.have.property('id')
                     expect(res.headers.location).to.eql(`/api/notes/${res.body.id}`)
